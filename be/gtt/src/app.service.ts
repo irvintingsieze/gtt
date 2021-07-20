@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-
+import * as apidata from './../data/gtt_api_data_clean.json';
 @Injectable()
 export class AppService {
   getHello(): string {
@@ -7,6 +7,6 @@ export class AppService {
   }
 
   getJSON() {
-    return 'Hello World!';
+    return JSON.stringify(apidata);
   }
 }
