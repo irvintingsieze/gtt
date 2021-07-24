@@ -4,17 +4,17 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientStatusModule } from './client-status/client-status.module';
 import { GttCheckModule } from './gtt-check/gtt-check.module';
-import { TradeModule } from './trade/trade.module';
 import { ClientStatus } from './client-status/entities/client-status.entity';
-import { ClientModule } from './client/client.module';
+import { TransactionFilterModule } from './transaction-filter/transaction-filter.module';
+import { TransactionFilter } from './transaction-filter/entities/transaction-filter.entity';
+import { GttCheck } from './gtt-check/entities/gtt-check.entity';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ClientStatus]),
+    TypeOrmModule.forFeature([ClientStatus, TransactionFilter, GttCheck]),
     TypeOrmModule.forRoot(),
     ClientStatusModule,
     GttCheckModule,
-    TradeModule,
-    ClientModule,
+    TransactionFilterModule,
   ],
   controllers: [AppController],
   providers: [AppService],

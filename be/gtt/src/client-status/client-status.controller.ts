@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ClientStatusService } from './client-status.service';
 import { CreateClientStatusDto } from './dto/create-client-status.dto';
 import { UpdateClientStatusDto } from './dto/update-client-status.dto';
@@ -13,17 +22,15 @@ export class ClientStatusController {
   }
 
   @Get()
-  findAll() {
-    return this.clientStatusService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.clientStatusService.findOne(+id);
+  findAll(@Query() date: { date: string }) {
+    return this.clientStatusService.findClientByDate(date.date);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClientStatusDto: UpdateClientStatusDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateClientStatusDto: UpdateClientStatusDto,
+  ) {
     return this.clientStatusService.update(+id, updateClientStatusDto);
   }
 

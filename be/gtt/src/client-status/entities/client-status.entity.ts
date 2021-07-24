@@ -14,4 +14,7 @@ export class ClientStatus {
 
   @Column()
   status: string;
+
+  @Column()
+  clientID: string;
 }

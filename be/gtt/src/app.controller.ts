@@ -11,7 +11,7 @@ export class AppController {
   }
 
   @Get('/json')
-  getJSON(): string {
-    return this.appService.getJSON();
+  getJSON() {
+    return this.appService.inputGTTTradeData();
   }
 }
