@@ -25,17 +25,4 @@ export class ClientStatusController {
   findAll(@Query() date: { date: string }) {
     return this.clientStatusService.findClientByDate(date.date);
   }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateClientStatusDto: UpdateClientStatusDto,
-  ) {
-    return this.clientStatusService.update(+id, updateClientStatusDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.clientStatusService.remove(+id);
-  }
 }
