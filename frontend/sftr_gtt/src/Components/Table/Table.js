@@ -7,7 +7,7 @@ const Table = (props) => {
       <DataGrid
         rows={props.list}
         columns={props.columnlist}
-        pageSize={10}
+        pageSize={5}
         components={{
           Toolbar: GridToolbar,
         }}

@@ -65,11 +65,12 @@ export class ClientStatusService {
 
   async findClientByTradeID(tradeID: string) {
     try {
-      const transactionFilter =
-        await this.transactionFilterRepository.findOneOrFail({
-          tradeId: tradeID,
-          isInScope: true,
-        });
+      const transactionFilter = await this.transactionFilterRepository.findOne({
+        tradeId: tradeID,
+      });
+      if (!transactionFilter) return 'Trade ID Not Found';
+      if (!transactionFilter.isInScope)
+        return 'Client Is Not In Scope And Good To Trade';
       const clientStatus = await this.clientStatusRepository.find({
         clientID: transactionFilter.clientID,
         entityID: transactionFilter.entityID,
@@ -77,13 +78,13 @@ export class ClientStatusService {
       });
       if (clientStatus.length !== 0) {
         return {
-          transactionID: transactionFilter.tradeId,
-          clients: [clientStatus],
+          tradeID: transactionFilter.tradeId,
+          clients: clientStatus,
         };
       }
-      return 'No Clients!';
+      return 'Client Is Good To Trade!';
     } catch (error) {
-      return new NotFoundException('Trade Id does not exist or not in scope!');
+      return new NotFoundException(error);
     }
   }
 
