@@ -23,10 +23,15 @@ export class ClientStatusService {
 
   async findClientByDate(date: string) {
     try {
+      const transactionExist = await this.transactionFilterRepository.find({
+        date: date,
+      });
+      if (!transactionExist.length) return 'No Trade On This Date';
       const transactionFilter = await this.transactionFilterRepository.find({
         date: date,
         isInScope: true,
       });
+      if (!transactionFilter.length) return 'All Trades Are Not In Scope';
       const outPutClientDetails = [];
       const clientList = [];
       for (let i = 0; i < transactionFilter.length; i++) {
@@ -57,6 +62,8 @@ export class ClientStatusService {
           );
         }
       }
+      if (!outPutClientDetails.length)
+        return 'All Clients Are GTT On This Date!';
       return outPutClientDetails;
     } catch (error) {
       return new InternalServerErrorException(error);

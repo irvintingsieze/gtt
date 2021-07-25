@@ -1,4 +1,5 @@
 .table {
-  height: 350px;
+  height: 425px;
   width: 100%;
+  overflow: hidden;
 }
