@@ -1,6 +1,5 @@
 import {
   AppBar,
-  Button,
   ListItem,
   Toolbar,
   IconButton,
@@ -20,14 +19,14 @@ import DateRangeIcon from "@material-ui/icons/DateRange";
 import BusinessCenterIcon from "@material-ui/icons/BusinessCenter";
 import SwapHorizIcon from "@material-ui/icons/SwapHoriz";
 import "./Navigation.css";
+import DEFAULT_COLOR from "../../Utils/Color";
 
 const NavigationBar = () => {
   const [open, setOpen] = React.useState(false);
-  const [currentTab, setCurrentTab] = React.useState("Home");
 
   return (
     <React.Fragment>
-      <AppBar position="static">
+      <AppBar position="static" style={{ backgroundColor: DEFAULT_COLOR }}>
         <Toolbar>
           <IconButton
             onClick={() => setOpen(true)}
@@ -37,8 +36,9 @@ const NavigationBar = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6">SFTR GTT</Typography>
-          <Button color="inherit">{`/${currentTab}`}</Button>
+          <Typography variant="h6">
+            Securities Financing Transaction Regulation
+          </Typography>
         </Toolbar>
       </AppBar>
       <SwipeableDrawer
@@ -78,7 +78,6 @@ const NavigationBar = () => {
   );
 
   function itemOnTap(item) {
-    setCurrentTab(item);
     setOpen(false);
   }
 };

@@ -1,0 +1,11 @@
+.container_margins {
+  margin-left: 8%;
+  margin-right: 8%;
+}
+
+.text_size {
+  font-size: xx-large;
+  font-weight: bold;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}

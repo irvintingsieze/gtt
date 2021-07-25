@@ -27,7 +27,7 @@ export class ClientStatusService {
         date: date,
         isInScope: true,
       });
-      let outPutClientDetails = [];
+      const outPutClientDetails = [];
       const clientList = [];
       for (let i = 0; i < transactionFilter.length; i++) {
         if (!clientList.includes(transactionFilter[i].clientID)) {
@@ -88,27 +88,32 @@ export class ClientStatusService {
   }
 
   async findDetailsByClientID(clientID: string) {
-    const client = await this.clientStatusRepository.find({
+    const clientExist = await this.clientStatusRepository.find({
       clientID: clientID,
-      status: RED_STATUS,
     });
-    if (client.length === 0) return 'All Gtt Pass or Client Not Found';
+    if (clientExist.length === 0) return 'Client Not Found';
+    const client = clientExist.filter((element) => {
+      return element.status === RED_STATUS;
+    });
+    if (client.length === 0) return 'Client Is Good To Trade';
     let transactionList = [];
     for (let i = 0; i < client.length; i++) {
       const transactions = await this.transactionFilterRepository.find({
-        select: ['tradeId'],
         where: {
           clientID: clientID,
           entityID: client[i].entityID,
           isInScope: true,
         },
       });
-      transactionList = transactionList.concat(transactions);
+      if (transactions.length > 0) {
+        const clientItem = {
+          client: client[i],
+          transactionList: transactions,
+        };
+        transactionList = transactionList.concat(clientItem);
+      }
     }
-    if (transactionList.length === 0) return 'No Trade';
-    return {
-      transactionList: transactionList,
-      clientList: client,
-    };
+    if (transactionList.length === 0) return 'No Trade History Found';
+    return transactionList;
   }
 }
