@@ -4,7 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateClientStatusDto } from './dto/create-client-status.dto';
-import { UpdateClientStatusDto } from './dto/update-client-status.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientStatus } from './entities/client-status.entity';

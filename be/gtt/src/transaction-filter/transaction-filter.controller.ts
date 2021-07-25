@@ -1,11 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { TransactionFilterService } from './transaction-filter.service';
 import { CreateTransactionFilterDto } from './dto/create-transaction-filter.dto';
-import { UpdateTransactionFilterDto } from './dto/update-transaction-filter.dto';
 
 @Controller('transaction-filter')
 export class TransactionFilterController {
-  constructor(private readonly transactionFilterService: TransactionFilterService) {}
+  constructor(
+    private readonly transactionFilterService: TransactionFilterService,
+  ) {}
 
   @Post()
   create(@Body() createTransactionFilterDto: CreateTransactionFilterDto) {
@@ -20,11 +29,6 @@ export class TransactionFilterController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.transactionFilterService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTransactionFilterDto: UpdateTransactionFilterDto) {
-    return this.transactionFilterService.update(+id, updateTransactionFilterDto);
   }
 
   @Delete(':id')

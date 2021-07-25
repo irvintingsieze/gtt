@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateGttCheckDto } from './dto/create-gtt-check.dto';
-import { UpdateGttCheckDto } from './dto/update-gtt-check.dto';
 
 @Injectable()
 export class GttCheckService {
@@ -14,10 +13,6 @@ export class GttCheckService {
 
   findOne(id: number) {
     return `This action returns a #${id} gttCheck`;
-  }
-
-  update(id: number, updateGttCheckDto: UpdateGttCheckDto) {
-    return `This action updates a #${id} gttCheck`;
   }
 
   remove(id: number) {
