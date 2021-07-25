@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { ClientStatusService } from './client-status.service';
 import { CreateClientStatusDto } from './dto/create-client-status.dto';
-import { UpdateClientStatusDto } from './dto/update-client-status.dto';
 
 @Controller('client-status')
 export class ClientStatusController {
@@ -21,8 +20,18 @@ export class ClientStatusController {
     return this.clientStatusService.create(createClientStatusDto);
   }
 
+  @Get('/trade/:tradeid')
+  findClientByTradeID(@Param('tradeid') tradeid: string) {
+    return this.clientStatusService.findClientByTradeID(tradeid);
+  }
+
   @Get()
-  findAll(@Query() date: { date: string }) {
-    return this.clientStatusService.findClientByDate(date.date);
+  findClientsByDate(@Query('date') date: string) {
+    return this.clientStatusService.findClientByDate(date);
+  }
+
+  @Get('/client/:clientid')
+  findDetailsByClientId(@Param('clientid') clientid: string) {
+    return this.clientStatusService.findDetailsByClientID(clientid);
   }
 }
