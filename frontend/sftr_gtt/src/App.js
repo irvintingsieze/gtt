@@ -1,24 +1,23 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import ClientQuery from "./Container/ClientIDQuery/ClientIDQuery";
+import DateQuery from "./Container/DateQuery/DateQuery";
+import TradeQuery from "./Container/TradeIDQuery/TradeIDQuery";
+import Main from "./Container/Main/Main";
+import "bootstrap/dist/css/bootstrap.min.css";
+import NavigationBar from "./Container/Navigation/NavigationBar";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Router>
+        <NavigationBar />
+        <Route exact path="/" component={Main} />
+        <Route path="/bofa/client" component={ClientQuery} />
+        <Route path="/bofa/date" component={DateQuery} />
+        <Route path="/bofa/trade" component={TradeQuery} />
+      </Router>
+    </>
   );
 }
 

@@ -1,0 +1,16 @@
+{
+  "navigation": [
+    {
+      "name": "Client",
+      "url": "/bofa/client"
+    },
+    {
+      "name": "Date",
+      "url": "/bofa/date"
+    },
+    {
+      "name": "Trade",
+      "url": "/bofa/trade"
+    }
+  ]
+}

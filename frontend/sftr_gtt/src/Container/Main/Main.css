@@ -1,0 +1,12 @@
+.text_centred {
+  text-align: center;
+  font-weight: bold;
+}
+
+.main_centred {
+  display: flex;
+  margin-left: 30%;
+  margin-right: 30%;
+  height: 40%;
+  width: 40%;
+}
