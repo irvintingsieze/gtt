@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as apidata from './../data/gtt_api_data_clean.json';
-//import * as tradedata from './../data/gtt_trade_clean.json';
+import * as tradedata from './../data/gtt_trade_data_clean.json';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientStatus } from './client-status/entities/client-status.entity';
@@ -18,6 +18,7 @@ export class AppService {
     private gttCheckRepository: Repository<GttCheck>,
   ) {}
 
+  /*
   async addTradeDataToDB(dataDto: DataDto) {
     try {
       return this.inputGTTTradeData(JSON.parse(dataDto.dataInput));
@@ -25,6 +26,7 @@ export class AppService {
       return new InternalServerErrorException(error);
     }
   }
+  */
 
   //Not Required By Requirements!
   async inputGTTApiData() {
@@ -45,7 +47,7 @@ export class AppService {
     }
   }
 
-  async inputGTTTradeData(tradedata) {
+  async inputGTTTradeData() {
     try {
       let i;
       for (i = 0; i < tradedata.data.length; i++) {
@@ -56,6 +58,10 @@ export class AppService {
           tradedata.data[i].regulatoryReportingDetails.counterpartyID;
         newTransactionFilter.entityID =
           tradedata.data[i].regulatoryReportingDetails.reportingCounterpartyID;
+        const client = await this.clientStatusRepository.find({
+          clientID: newTransactionFilter.clientID,
+          entityID: newTransactionFilter.entityID,
+        });
         newTransactionFilter.date = tradedata.data[i].date;
         newGttCheck.jurisdiction = tradedata.data[i].jurisdiction;
         newGttCheck.regulation = tradedata.data[i].regulation;
@@ -86,6 +92,7 @@ export class AppService {
           newTransactionFilter.isInScope = false;
         }
         await this.gttCheckRepository.save(newGttCheck);
+        newTransactionFilter.client = client;
         await this.transactionFilterRepository.save(newTransactionFilter);
       }
       return JSON.stringify(tradedata);

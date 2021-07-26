@@ -1,10 +1,16 @@
 {
   "type": "postgres",
-  "host": "localhost",
+  "host": "ec2-3-233-100-43.compute-1.amazonaws.com",
   "port": 5432,
-  "username": "postgres",
-  "password": "password",
-  "database": "GTT",
+  "username": "kwvdkpfuaxzwyu",
+  "password": "5e5ec44e52373866b0bc3fe1689c61b4ecd825f5c3935f8db1fce9cd404f9edf",
+  "database": "d4ukkh028k9ik8",
   "entities": ["dist/**/*.entity{.ts,.js}"],
-  "synchronize": true
+  "synchronize": true,
+  "ssl": true,
+  "extra": {
+    "ssl": {
+      "rejectUnauthorized": false
+    }
+  }
 }

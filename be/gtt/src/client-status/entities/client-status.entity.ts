@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { TransactionFilter } from 'src/transaction-filter/entities/transaction-filter.entity';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('client_status')
 export class ClientStatus {
@@ -17,4 +18,10 @@ export class ClientStatus {
 
   @Column()
   clientID: string;
+
+  @ManyToMany(
+    () => TransactionFilter,
+    (trade: TransactionFilter) => trade.client,
+  )
+  public trade: TransactionFilter[];
 }

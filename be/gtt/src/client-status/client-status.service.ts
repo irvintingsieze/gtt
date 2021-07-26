@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
-import { CreateClientStatusDto } from './dto/create-client-status.dto';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientStatus } from './entities/client-status.entity';
@@ -17,111 +12,89 @@ export class ClientStatusService {
     @InjectRepository(TransactionFilter)
     private transactionFilterRepository: Repository<TransactionFilter>,
   ) {}
-  create(createClientStatusDto: CreateClientStatusDto) {
-    return 'This action adds a new clientStatus';
-  }
 
-  async findClientByDate(date: string) {
+  async findClientByTradeID(tradeid: string) {
     try {
-      const transactionExist = await this.transactionFilterRepository.find({
-        date: date,
+      const tradeClient = await this.transactionFilterRepository.find({
+        relations: ['client'],
+        where: [{ tradeId: tradeid, isInScope: true }],
       });
-      if (!transactionExist.length) return 'No Trade On This Date';
-      const transactionFilter = await this.transactionFilterRepository.find({
-        date: date,
-        isInScope: true,
-      });
-      if (!transactionFilter.length) return 'All Trades Are Not In Scope';
-      const outPutClientDetails = [];
-      const clientList = [];
-      for (let i = 0; i < transactionFilter.length; i++) {
-        if (!clientList.includes(transactionFilter[i].clientID)) {
-          const clientDetailList = await this.clientStatusRepository.find({
-            clientID: transactionFilter[i].clientID,
-            entityID: transactionFilter[i].entityID,
-            status: RED_STATUS,
+      const returnList = [];
+      for (let i = 0; i < tradeClient[0].client.length; i++) {
+        if (tradeClient[0].client[i].status === RED_STATUS)
+          returnList.push({
+            id: tradeClient[0].client[i].id,
+            tradeId: tradeid,
+            entityId: tradeClient[0].entityID,
+            clientId: tradeClient[0].clientID,
+            documentId: tradeClient[0].client[i].documentID,
+            date: tradeClient[0].date,
           });
-          if (clientDetailList.length === 0) {
-            continue;
-          }
-          clientList.push(transactionFilter[i].clientID);
-          const newTransactionObj = {
-            transactions: [transactionFilter[i].tradeId],
-            clients: clientDetailList,
-          };
-          outPutClientDetails.push(newTransactionObj);
-        } else {
-          const isClient = (element) => {
-            return (
-              element.clients[0].clientID === transactionFilter[i].clientID
-            );
-          };
-          const indexInArr = outPutClientDetails.findIndex(isClient);
-          outPutClientDetails[indexInArr].transactions.push(
-            transactionFilter[i].tradeId,
-          );
-        }
       }
-      if (!outPutClientDetails.length)
-        return 'All Clients Are GTT On This Date!';
-      return outPutClientDetails;
+      if (returnList.length === 0) return 'All Client Pass GTT Check!';
+      return returnList;
     } catch (error) {
       return new InternalServerErrorException(error);
     }
   }
 
-  async findClientByTradeID(tradeID: string) {
+  async findDetailsByClientID(clientid: string) {
     try {
-      const transactionFilter = await this.transactionFilterRepository.findOne({
-        tradeId: tradeID,
+      const client = await this.clientStatusRepository.find({
+        relations: ['trade'],
+        where: [{ clientID: clientid, status: RED_STATUS }],
       });
-      if (!transactionFilter) return 'Trade ID Not Found';
-      if (!transactionFilter.isInScope)
-        return 'Client Is Not In Scope And Good To Trade';
-      const clientStatus = await this.clientStatusRepository.find({
-        clientID: transactionFilter.clientID,
-        entityID: transactionFilter.entityID,
-        status: RED_STATUS,
-      });
-      if (clientStatus.length !== 0) {
-        return {
-          tradeID: transactionFilter.tradeId,
-          clients: clientStatus,
-        };
+      const resultList = [];
+      let index = 0;
+      for (let i = 0; i < client.length; i++) {
+        for (let j = 0; j < client[i].trade.length; j++) {
+          if (client[i].trade[j].isInScope === true) {
+            index += 1;
+            resultList.push({
+              id: index,
+              tradeId: client[i].trade[j].tradeId,
+              entityId: client[i].entityID,
+              clientId: clientid,
+              documentId: client[i].documentID,
+              date: client[i].trade[j].date,
+            });
+          }
+        }
       }
-      return 'Client Is Good To Trade!';
+      if (resultList.length === 0) return 'In Scope for GTT Check And GTT!';
+      return resultList;
     } catch (error) {
-      return new NotFoundException(error);
+      return new InternalServerErrorException(error);
     }
   }
 
-  async findDetailsByClientID(clientID: string) {
-    const clientExist = await this.clientStatusRepository.find({
-      clientID: clientID,
-    });
-    if (clientExist.length === 0) return 'Client Not Found';
-    const client = clientExist.filter((element) => {
-      return element.status === RED_STATUS;
-    });
-    if (client.length === 0) return 'Client Is Good To Trade';
-    let transactionList = [];
-    for (let i = 0; i < client.length; i++) {
-      const transactions = await this.transactionFilterRepository.find({
-        where: {
-          clientID: clientID,
-          entityID: client[i].entityID,
-          isInScope: true,
-        },
+  async findClientByDate(date: string) {
+    try {
+      const tradeList = await this.transactionFilterRepository.find({
+        relations: ['client'],
+        where: [{ date: date, isInScope: true }],
       });
-      if (transactions.length > 0) {
-        const clientItem = {
-          client: client[i],
-          transactionList: transactions,
-        };
-        transactionList = transactionList.concat(clientItem);
+      let index = 0;
+      const resultList = [];
+      for (let i = 0; i < tradeList.length; i++) {
+        for (let j = 0; j < tradeList[i].client.length; j++) {
+          if (tradeList[i].client[j].status === RED_STATUS) {
+            index += 1;
+            resultList.push({
+              id: index,
+              tradeId: tradeList[i].tradeId,
+              entityId: tradeList[i].entityID,
+              clientId: tradeList[i].client[j].clientID,
+              documentId: tradeList[i].client[j].documentID,
+              date: date,
+            });
+          }
+        }
       }
+      if (resultList.length === 0) return 'In Scope for GTT Check And GTT!';
+      return resultList;
+    } catch (error) {
+      return new InternalServerErrorException(error);
     }
-    if (transactionList.length === 0) return 'No Trade History Found';
-    return transactionList;
   }
 }

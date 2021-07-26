@@ -7,6 +7,12 @@ export class AppController {
 
   @Post('/add_data')
   addData(@Body() dataDto: DataDto) {
-    return this.appService.addTradeDataToDB(dataDto);
+    //return this.appService.addTradeDataToDB(dataDto);
+  }
+
+  @Post('/add_data_local')
+  addLocalData() {
+    //this.appService.inputGTTApiData();
+    return this.appService.inputGTTTradeData();
   }
 }

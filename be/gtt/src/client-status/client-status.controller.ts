@@ -1,28 +1,36 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Query } from '@nestjs/common';
 import { ClientStatusService } from './client-status.service';
-import { CreateClientStatusDto } from './dto/create-client-status.dto';
+import { CommonValidateService } from './common-validate.service';
 
 @Controller('client-status')
 export class ClientStatusController {
-  constructor(private readonly clientStatusService: ClientStatusService) {}
+  constructor(
+    private readonly clientStatusService: ClientStatusService,
+    private readonly validateService: CommonValidateService,
+  ) {}
 
-  @Post()
-  create(@Body() createClientStatusDto: CreateClientStatusDto) {
-    return this.clientStatusService.create(createClientStatusDto);
-  }
-
-  @Get('/trade/:tradeid')
-  findClientByTradeID(@Param('tradeid') tradeid: string) {
+  @Get('/trade')
+  async findClientByTradeID(@Query('tradeid') tradeid: string) {
+    if (!(await this.validateService.doesInputValueExist(tradeid, 'trade')))
+      return 'Trade ID Not Found!';
+    if (!(await this.validateService.isInScopeGTTCheck(tradeid, 'trade')))
+      return 'Not In Scope For GTT Check!';
     return this.clientStatusService.findClientByTradeID(tradeid);
   }
 
-  @Get()
-  findClientsByDate(@Query('date') date: string) {
+  @Get('/date')
+  async findClientsByDate(@Query('date') date: string) {
+    if (!(await this.validateService.doesInputValueExist(date, 'date')))
+      return 'No Trades In This Date!';
+    if (!(await this.validateService.isInScopeGTTCheck(date, 'date')))
+      return 'Not In Scope For GTT Check!';
     return this.clientStatusService.findClientByDate(date);
   }
 
-  @Get('/client/:clientid')
-  findDetailsByClientId(@Param('clientid') clientid: string) {
+  @Get('/client')
+  async findDetailsByClientId(@Query('clientid') clientid: string) {
+    if (!(await this.validateService.doesInputValueExist(clientid, 'client')))
+      return 'No Clients Found!';
     return this.clientStatusService.findDetailsByClientID(clientid);
   }
 }
