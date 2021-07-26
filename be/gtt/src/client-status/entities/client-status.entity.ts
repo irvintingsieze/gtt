@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { TransactionFilter } from 'src/transaction-filter/entities/transaction-filter.entity';
+import { TransactionFilter } from './../../../src/transaction-filter/entities/transaction-filter.entity';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('client_status')

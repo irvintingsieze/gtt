@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientStatus } from './entities/client-status.entity';
-import { TransactionFilter } from 'src/transaction-filter/entities/transaction-filter.entity';
+import { TransactionFilter } from './../../src/transaction-filter/entities/transaction-filter.entity';
 import RED_STATUS from './../../utils/Constants';
 @Injectable()
 export class ClientStatusService {
@@ -31,7 +31,7 @@ export class ClientStatusService {
             date: tradeClient[0].date,
           });
       }
-      if (returnList.length === 0) return 'All Client Pass GTT Check!';
+      if (returnList.length === 0) return 'Client Pass GTT Check!';
       return returnList;
     } catch (error) {
       return new InternalServerErrorException(error);

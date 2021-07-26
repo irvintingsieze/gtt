@@ -6,7 +6,6 @@ import { Repository } from 'typeorm';
 import { ClientStatus } from './client-status/entities/client-status.entity';
 import { TransactionFilter } from './transaction-filter/entities/transaction-filter.entity';
 import { GttCheck } from './gtt-check/entities/gtt-check.entity';
-import { DataDto } from './data.dto';
 @Injectable()
 export class AppService {
   constructor(
@@ -62,6 +61,7 @@ export class AppService {
           clientID: newTransactionFilter.clientID,
           entityID: newTransactionFilter.entityID,
         });
+        if (client.length === 0) continue;
         newTransactionFilter.date = tradedata.data[i].date;
         newGttCheck.jurisdiction = tradedata.data[i].jurisdiction;
         newGttCheck.regulation = tradedata.data[i].regulation;

@@ -12,7 +12,7 @@ export class AppController {
 
   @Post('/add_data_local')
   addLocalData() {
-    //this.appService.inputGTTApiData();
+    //return this.appService.inputGTTApiData();
     return this.appService.inputGTTTradeData();
   }
 }
