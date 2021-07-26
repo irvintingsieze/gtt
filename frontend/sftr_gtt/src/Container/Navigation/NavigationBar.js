@@ -20,7 +20,7 @@ import BusinessCenterIcon from "@material-ui/icons/BusinessCenter";
 import SwapHorizIcon from "@material-ui/icons/SwapHoriz";
 import "./Navigation.css";
 import DEFAULT_COLOR from "../../Utils/Color";
-
+import HomeIcon from "@material-ui/icons/Home";
 const NavigationBar = () => {
   const [open, setOpen] = React.useState(false);
 
@@ -36,7 +36,8 @@ const NavigationBar = () => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6">
+
+          <Typography className="no_deco" variant="h6">
             Securities Financing Transaction Regulation
           </Typography>
         </Toolbar>
@@ -58,9 +59,11 @@ const NavigationBar = () => {
                 >
                   <ListItem button component={Link} to={jsonObj.url}>
                     <ListItemIcon>
-                      {jsonObj.name === "Client" ? (
+                      {jsonObj.name === Navjson.navigation[0].name ? (
+                        <HomeIcon />
+                      ) : jsonObj.name === Navjson.navigation[1].name ? (
                         <BusinessCenterIcon />
-                      ) : jsonObj.name === "Date" ? (
+                      ) : jsonObj.name === Navjson.navigation[2].name ? (
                         <DateRangeIcon />
                       ) : (
                         <SwapHorizIcon />

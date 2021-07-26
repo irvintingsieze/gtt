@@ -2,3 +2,8 @@
   height: 60%;
   width: 60%;
 }
+
+.no_deco {
+  text-decoration: none;
+  color: white;
+}

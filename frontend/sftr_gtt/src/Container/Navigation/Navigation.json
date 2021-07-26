@@ -1,6 +1,10 @@
 {
   "navigation": [
     {
+      "name": "Home",
+      "url": "/"
+    },
+    {
       "name": "Client",
       "url": "/bofa/client"
     },

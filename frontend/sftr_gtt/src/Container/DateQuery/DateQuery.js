@@ -28,7 +28,6 @@ const DateQuery = () => {
       const displayList = [];
       const sgDate = moment(date).format("YYYYMMDD");
       const URL = BASE_BACKEND_URL + "/client-status?date=" + sgDate;
-      console.log(URL);
       const response = await axios.get(URL);
       if (
         response.data === "No Trade On This Date" ||
