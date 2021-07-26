@@ -11,6 +11,7 @@ export class ClientStatusController {
 
   @Get('/trade')
   async findClientByTradeID(@Query('tradeid') tradeid: string) {
+    tradeid = tradeid.toUpperCase();
     if (!(await this.validateService.doesInputValueExist(tradeid, 'trade')))
       return 'Trade ID Not Found!';
     if (!(await this.validateService.isInScopeGTTCheck(tradeid, 'trade')))
@@ -29,6 +30,7 @@ export class ClientStatusController {
 
   @Get('/client')
   async findDetailsByClientId(@Query('clientid') clientid: string) {
+    clientid = clientid.toUpperCase();
     if (!(await this.validateService.doesInputValueExist(clientid, 'client')))
       return 'No Clients Found!';
     return this.clientStatusService.findDetailsByClientID(clientid);
