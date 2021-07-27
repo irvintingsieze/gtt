@@ -3,3 +3,9 @@
   font-weight: bold;
   margin-top: 16px;
 }
+
+.img {
+  width: 35%;
+  height: 35%;
+  padding-bottom: 5em;
+}

@@ -1,18 +1,29 @@
-import { Controller, Get, Body, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Post,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { DataDto } from './data.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs';
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Post('/add_data')
-  addData(@Body() dataDto: DataDto) {
-    //return this.appService.addTradeDataToDB(dataDto);
-  }
-
-  @Post('/add_data_local')
-  addLocalData() {
-    //return this.appService.inputGTTApiData();
-    return this.appService.inputGTTTradeData();
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    try {
+      const data = fs.readFileSync('./data/' + file.filename, 'utf8');
+      const jsonData = JSON.parse(data);
+      this.appService.inputGTTTradeData(jsonData);
+      return 'Data Added! ' + file.filename;
+    } catch (error) {
+      return 'File Is In Wrong Format!';
+    }
   }
 }

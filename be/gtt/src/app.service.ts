@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import * as apidata from './../data/gtt_api_data_clean.json';
-import * as tradedata from './../data/gtt_trade_data_clean.json';
+//import * as apidata from './../data/gtt_api_data_clean.json';
+//import * as tradedata from './../data/gtt_trade_data_clean.json';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientStatus } from './client-status/entities/client-status.entity';
@@ -17,17 +17,8 @@ export class AppService {
     private gttCheckRepository: Repository<GttCheck>,
   ) {}
 
-  /*
-  async addTradeDataToDB(dataDto: DataDto) {
-    try {
-      return this.inputGTTTradeData(JSON.parse(dataDto.dataInput));
-    } catch (error) {
-      return new InternalServerErrorException(error);
-    }
-  }
-  */
-
   //Not Required By Requirements!
+  /*
   async inputGTTApiData() {
     let i, j;
     for (i = 0; i < apidata.data.length; i++) {
@@ -45,8 +36,30 @@ export class AppService {
       }
     }
   }
+  */
 
-  async inputGTTTradeData() {
+  checkIsInScope(tradedataitem) {
+    if (
+      tradedataitem.regulation === 'SFT_REPORTING' &&
+      tradedataitem.reportingSide === 'FIRM' &&
+      (tradedataitem.jurisdiction === 'UK' ||
+        tradedataitem.jurisdiction === 'EU') &&
+      (tradedataitem.securitiesFinancingTransactionType ===
+        'SECURITIES_LENDING' ||
+        tradedataitem.securitiesFinancingTransactionType === 'REPURCHASE' ||
+        tradedataitem.securitiesFinancingTransactionType === 'MARGIN_LENDING' ||
+        tradedataitem.securitiesFinancingTransactionType === 'BUY_BACK') &&
+      (tradedataitem.regulatoryReportingDetails.reportingCounterpartyID ===
+        'FNB-UK' ||
+        tradedataitem.regulatoryReportingDetails.reportingCounterpartyID ===
+          'FNB-EU')
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  async inputGTTTradeData(tradedata) {
     try {
       let i;
       for (i = 0; i < tradedata.data.length; i++) {
@@ -69,33 +82,11 @@ export class AppService {
         newGttCheck.securitiesFinancingTransactionType =
           tradedata.data[i].securitiesFinancingTransactionType;
         newGttCheck.tradeId = tradedata.data[i].tradeID;
-        if (
-          tradedata.data[i].regulation === 'SFT_REPORTING' &&
-          tradedata.data[i].reportingSide === 'FIRM' &&
-          (tradedata.data[i].jurisdiction === 'UK' ||
-            tradedata.data[i].jurisdiction === 'EU') &&
-          (tradedata.data[i].securitiesFinancingTransactionType ===
-            'SECURITIES_LENDING' ||
-            tradedata.data[i].securitiesFinancingTransactionType ===
-              'REPURCHASE' ||
-            tradedata.data[i].securitiesFinancingTransactionType ===
-              'MARGIN_LENDING' ||
-            tradedata.data[i].securitiesFinancingTransactionType ===
-              'BUY_BACK') &&
-          (tradedata.data[i].regulatoryReportingDetails
-            .reportingCounterpartyID === 'FNB-UK' ||
-            tradedata.data[i].regulatoryReportingDetails
-              .reportingCounterpartyID === 'FNB-EU')
-        ) {
-          newTransactionFilter.isInScope = true;
-        } else {
-          newTransactionFilter.isInScope = false;
-        }
+        newTransactionFilter.isInScope = this.checkIsInScope(tradedata.data[i]);
         await this.gttCheckRepository.save(newGttCheck);
         newTransactionFilter.client = client;
         await this.transactionFilterRepository.save(newTransactionFilter);
       }
-      return JSON.stringify(tradedata);
     } catch (error) {
       return new InternalServerErrorException(error);
     }

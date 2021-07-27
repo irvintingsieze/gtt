@@ -11,6 +11,7 @@ const TradeIDQuery = () => {
   const [respMsg, setRespMsg] = useState("");
 
   const fetchClientData = async () => {
+    if (tradeID.length === 0) return;
     try {
       const URL = BASE_BACKEND_URL + "/client-status/trade?tradeid=" + tradeID;
       const response = await axios.get(URL);

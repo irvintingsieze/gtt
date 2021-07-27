@@ -11,6 +11,7 @@ const ClientIDQuery = () => {
   const [respMsg, setRespMsg] = useState("");
 
   const fetchClientData = async () => {
+    if (clientID.length === 0) return;
     try {
       const URL =
         BASE_BACKEND_URL + "/client-status/client?clientid=" + clientID;

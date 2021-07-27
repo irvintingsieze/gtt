@@ -18,7 +18,6 @@ const DateQuery = () => {
 
   const fetchClientData = async () => {
     try {
-      const displayList = [];
       const sgDate = moment(date).format("YYYYMMDD");
       const URL = BASE_BACKEND_URL + "/client-status/date?date=" + sgDate;
       const response = await axios.get(URL);

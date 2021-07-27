@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientStatus } from './entities/client-status.entity';
 import { TransactionFilter } from 'src/transaction-filter/entities/transaction-filter.entity';
+import { TRADE, CLIENT, DATE } from './../../utils/Constants';
 @Injectable()
 export class CommonValidateService {
   constructor(
@@ -15,15 +16,15 @@ export class CommonValidateService {
   async doesInputValueExist(value: string, type: string) {
     try {
       let respList;
-      if (type === 'client')
+      if (type === CLIENT)
         respList = await this.clientStatusRepository.find({
           clientID: value,
         });
-      else if (type === 'trade')
+      else if (type === TRADE)
         respList = await this.transactionFilterRepository.find({
           tradeId: value,
         });
-      else if (type === 'date')
+      else if (type === DATE)
         respList = await this.transactionFilterRepository.find({
           date: value,
         });
@@ -37,12 +38,12 @@ export class CommonValidateService {
   async isInScopeGTTCheck(value: string, type: string) {
     try {
       let respList;
-      if (type === 'trade')
+      if (type === TRADE)
         respList = await this.transactionFilterRepository.find({
           tradeId: value,
           isInScope: true,
         });
-      else if (type === 'date')
+      else if (type === DATE)
         respList = await this.transactionFilterRepository.find({
           date: value,
           isInScope: true,
