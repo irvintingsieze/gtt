@@ -15,47 +15,23 @@ const DateQuery = () => {
   const [date, setDate] = useState(new Date());
   const [clientList, setClientList] = useState([]);
   const [respMsg, setRespMsg] = useState("");
-  const trade_columns = [
-    { field: "id", headerName: "Row", width: 150 },
-    { field: "clientID", headerName: "Client ID", width: 200 },
-    { field: "entityID", headerName: "Entity ID", width: 200 },
-    { field: "documentID", headerName: "Document ID", width: 200 },
-    { field: "tradeID", headerName: "Trade ID", width: 200 },
-  ];
 
   const fetchClientData = async () => {
     try {
-      const displayList = [];
       const sgDate = moment(date).format("YYYYMMDD");
-      const URL = BASE_BACKEND_URL + "/client-status?date=" + sgDate;
-      console.log(URL);
+      const URL = BASE_BACKEND_URL + "/client-status/date?date=" + sgDate;
       const response = await axios.get(URL);
       if (
-        response.data === "No Trade On This Date" ||
-        response.data === "All Trades Are Not In Scope" ||
-        response.data === "All Clients Are GTT On This Date!"
+        response.data === "No Trades In This Date!" ||
+        response.data === "Not In Scope For GTT Check!" ||
+        response.data === "In Scope for GTT Check And GTT!"
       ) {
         setRespMsg(response.data);
         setClientList([]);
         return;
       }
       setRespMsg("");
-      let count = 0;
-      for (let i = 0; i < response.data.length; i++) {
-        for (let j = 0; j < response.data[i].clients.length; j++) {
-          for (let k = 0; k < response.data[i].transactions.length; k++) {
-            count += 1;
-            displayList.push({
-              id: count,
-              clientID: response.data[i].clients[j].clientID,
-              entityID: response.data[i].clients[j].entityID,
-              documentID: response.data[i].clients[j].documentID,
-              tradeID: response.data[i].transactions[k].toString(),
-            });
-          }
-        }
-      }
-      setClientList(displayList);
+      setClientList(response.data);
     } catch (err) {
       console.error(err);
     }
@@ -96,7 +72,7 @@ const DateQuery = () => {
 
       <center className="text_size">{respMsg}</center>
       {clientList.length ? (
-        <Table list={clientList} columnlist={trade_columns} />
+        <Table list={clientList} />
       ) : (
         <center className="text_size">Please Select A Date</center>
       )}

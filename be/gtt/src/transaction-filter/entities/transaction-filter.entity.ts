@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { ClientStatus } from 'src/client-status/entities/client-status.entity';
+import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from 'typeorm';
 
 @Entity('transaction_filter')
 export class TransactionFilter {
@@ -17,4 +18,8 @@ export class TransactionFilter {
 
   @Column()
   isInScope: boolean;
+
+  @ManyToMany(() => ClientStatus, (client: ClientStatus) => client.trade)
+  @JoinTable()
+  public client: ClientStatus[];
 }

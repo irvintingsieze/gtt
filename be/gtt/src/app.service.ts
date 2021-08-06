@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import * as apidata from './../data/gtt_api_data_clean.json';
-import * as tradedata from './../data/gtt_trade_clean.json';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+//import * as apidata from './../data/gtt_api_data_clean.json';
+//import * as tradedata from './../data/gtt_trade_data_clean.json';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientStatus } from './client-status/entities/client-status.entity';
@@ -16,10 +16,9 @@ export class AppService {
     @InjectRepository(GttCheck)
     private gttCheckRepository: Repository<GttCheck>,
   ) {}
-  getHello(): string {
-    return 'Hello World!';
-  }
 
+  //Not Required By Requirements!
+  /*
   async inputGTTApiData() {
     let i, j;
     for (i = 0; i < apidata.data.length; i++) {
@@ -37,49 +36,59 @@ export class AppService {
       }
     }
   }
+  */
 
-  async inputGTTTradeData() {
-    let i;
-    for (i = 0; i < tradedata.data.length; i++) {
-      const newTransactionFilter = new TransactionFilter();
-      const newGttCheck = new GttCheck();
-      newTransactionFilter.tradeId = tradedata.data[i].tradeID;
-      newTransactionFilter.clientID =
-        tradedata.data[i].regulatoryReportingDetails.counterpartyID;
-      newTransactionFilter.entityID =
-        tradedata.data[i].regulatoryReportingDetails.reportingCounterpartyID;
-      newTransactionFilter.date = tradedata.data[i].date;
-      newGttCheck.jurisdiction = tradedata.data[i].jurisdiction;
-      newGttCheck.regulation = tradedata.data[i].regulation;
-      newGttCheck.reportingSide = tradedata.data[i].reportingSide;
-      newGttCheck.securitiesFinancingTransactionType =
-        tradedata.data[i].securitiesFinancingTransactionType;
-      newGttCheck.tradeId = tradedata.data[i].tradeID;
-      if (
-        tradedata.data[i].regulation === 'SFT_REPORTING' &&
-        tradedata.data[i].reportingSide === 'FIRM' &&
-        (tradedata.data[i].jurisdiction === 'UK' ||
-          tradedata.data[i].jurisdiction === 'EU') &&
-        (tradedata.data[i].securitiesFinancingTransactionType ===
-          'SECURITIES_LENDING' ||
-          tradedata.data[i].securitiesFinancingTransactionType ===
-            'REPURCHASE' ||
-          tradedata.data[i].securitiesFinancingTransactionType ===
-            'MARGIN_LENDING' ||
-          tradedata.data[i].securitiesFinancingTransactionType ===
-            'BUY_BACK') &&
-        (tradedata.data[i].regulatoryReportingDetails
-          .reportingCounterpartyID === 'FNB-UK' ||
-          tradedata.data[i].regulatoryReportingDetails
-            .reportingCounterpartyID === 'FNB-EU')
-      ) {
-        newTransactionFilter.isInScope = true;
-      } else {
-        newTransactionFilter.isInScope = false;
-      }
-      await this.gttCheckRepository.save(newGttCheck);
-      await this.transactionFilterRepository.save(newTransactionFilter);
+  checkIsInScope(tradedataitem) {
+    if (
+      tradedataitem.regulation === 'SFT_REPORTING' &&
+      tradedataitem.reportingSide === 'FIRM' &&
+      (tradedataitem.jurisdiction === 'UK' ||
+        tradedataitem.jurisdiction === 'EU') &&
+      (tradedataitem.securitiesFinancingTransactionType ===
+        'SECURITIES_LENDING' ||
+        tradedataitem.securitiesFinancingTransactionType === 'REPURCHASE' ||
+        tradedataitem.securitiesFinancingTransactionType === 'MARGIN_LENDING' ||
+        tradedataitem.securitiesFinancingTransactionType === 'BUY_BACK') &&
+      (tradedataitem.regulatoryReportingDetails.reportingCounterpartyID ===
+        'FNB-UK' ||
+        tradedataitem.regulatoryReportingDetails.reportingCounterpartyID ===
+          'FNB-EU')
+    ) {
+      return true;
     }
-    return JSON.stringify(tradedata);
+    return false;
+  }
+
+  async inputGTTTradeData(tradedata) {
+    try {
+      let i;
+      for (i = 0; i < tradedata.data.length; i++) {
+        const newTransactionFilter = new TransactionFilter();
+        const newGttCheck = new GttCheck();
+        newTransactionFilter.tradeId = tradedata.data[i].tradeID;
+        newTransactionFilter.clientID =
+          tradedata.data[i].regulatoryReportingDetails.counterpartyID;
+        newTransactionFilter.entityID =
+          tradedata.data[i].regulatoryReportingDetails.reportingCounterpartyID;
+        const client = await this.clientStatusRepository.find({
+          clientID: newTransactionFilter.clientID,
+          entityID: newTransactionFilter.entityID,
+        });
+        if (client.length === 0) continue;
+        newTransactionFilter.date = tradedata.data[i].date;
+        newGttCheck.jurisdiction = tradedata.data[i].jurisdiction;
+        newGttCheck.regulation = tradedata.data[i].regulation;
+        newGttCheck.reportingSide = tradedata.data[i].reportingSide;
+        newGttCheck.securitiesFinancingTransactionType =
+          tradedata.data[i].securitiesFinancingTransactionType;
+        newGttCheck.tradeId = tradedata.data[i].tradeID;
+        newTransactionFilter.isInScope = this.checkIsInScope(tradedata.data[i]);
+        await this.gttCheckRepository.save(newGttCheck);
+        newTransactionFilter.client = client;
+        await this.transactionFilterRepository.save(newTransactionFilter);
+      }
+    } catch (error) {
+      return new InternalServerErrorException(error);
+    }
   }
 }

@@ -9,41 +9,23 @@ const ClientIDQuery = () => {
   const [clientID, setClientID] = useState("");
   const [clientList, setClientList] = useState([]);
   const [respMsg, setRespMsg] = useState("");
-  const client_columns = [
-    { field: "id", headerName: "Trade ID", width: 200 },
-    { field: "clientID", headerName: "Client ID", width: 200 },
-    { field: "entityID", headerName: "Entity ID", width: 200 },
-    { field: "documentID", headerName: "Document ID", width: 200 },
-    { field: "date", headerName: "Date", width: 200 },
-  ];
 
   const fetchClientData = async () => {
+    if (clientID.length === 0) return;
     try {
-      const displayList = [];
-      const URL = BASE_BACKEND_URL + "/client-status/client/" + clientID;
+      const URL =
+        BASE_BACKEND_URL + "/client-status/client?clientid=" + clientID;
       const response = await axios.get(URL);
       if (
-        response.data === "Client Not Found" ||
-        response.data === "Client Not Found" ||
-        response.data === "Client Is Good To Trade"
+        response.data === "No Clients Found!" ||
+        response.data === "Client Pass GTT Check!"
       ) {
         setRespMsg(response.data);
         setClientList([]);
         return;
       }
       setRespMsg("");
-      for (let i = 0; i < response.data.length; i++) {
-        for (let j = 0; j < response.data[i].transactionList.length; j++) {
-          displayList.push({
-            id: response.data[i].transactionList[j].tradeId,
-            clientID: response.data[i].client.clientID,
-            entityID: response.data[i].client.entityID,
-            documentID: response.data[i].client.documentID,
-            date: response.data[i].transactionList[j].date,
-          });
-        }
-      }
-      setClientList(displayList);
+      setClientList(response.data);
     } catch (err) {
       console.error(err);
     }
@@ -58,7 +40,7 @@ const ClientIDQuery = () => {
       <Form name="Client ID" onSubmitChange={setClientID} />
       <center className="text_size">{respMsg}</center>
       {clientList.length ? (
-        <Table list={clientList} columnlist={client_columns} />
+        <Table list={clientList} />
       ) : (
         <center className="text_size">Please Query A Client ID</center>
       )}
