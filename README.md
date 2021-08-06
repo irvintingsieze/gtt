@@ -1,4 +1,4 @@
-Bank Of America Coding Challenge
+# Bank Of America Coding Challenge
 
 Creating full stack application to help determine if the trade requires a GTT check and client has filled up required documents for the check.
 
